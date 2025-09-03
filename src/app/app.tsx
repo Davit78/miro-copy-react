@@ -1,12 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { AppHeader } from "@/features/header";
-import { CONFIG } from "@/shared/model/config";
+import { ROUTES } from "@/shared/model/routes";
 
 export function App() {
-  console.log(CONFIG.API_BASE_URL)
+  const location = useLocation();
+
+  const isAuthPage = location.pathname === ROUTES.LOGIN || location.pathname === ROUTES.REGISTER
   return (
     <div>
-      <AppHeader />
+      {!isAuthPage && <AppHeader />}
       <Outlet />
     </div>
   );
