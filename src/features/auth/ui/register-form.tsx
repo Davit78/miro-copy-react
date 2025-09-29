@@ -11,22 +11,29 @@ import { Input } from "@/shared/ui/kit/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRegister } from "../model/user-registr";
 
-const loginSchema = z.object({
-  email: z.string("Email is required!").email("Wrong email!"),
-  password: z
-    .string("Password is required!")
-    .min(6, "Password must be at least 6 characters!"),
-});
+const registerSchema = z
+  .object({
+    email: z.string("Email is required!").email("Wrong email!"),
+    password: z
+      .string("Password is required!")
+      .min(6, "Password must be at least 6 characters!"),
+    confirmPassword: z.string().optional(),
+  })
+  .refine((data) => data.confirmPassword === data.password, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match!",
+  });
 
-export function LoginForm() {
+export function RegisterForm() {
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    console.log(data);
-  });
+  const { register, isPending, errorMessage } = useRegister();
+
+  const onSubmit = form.handleSubmit(register);
 
   return (
     <Form {...form}>
@@ -40,7 +47,6 @@ export function LoginForm() {
               <FormControl>
                 <Input placeholder="admin@gmail.com" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -59,7 +65,21 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Log In</Button>
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        <Button type="submit" disabled={isPending}>Sign Up</Button>
       </form>
     </Form>
   );
