@@ -5,7 +5,7 @@ import { useSession } from "@/shared/model/session";
 import { Navigate, Outlet, redirect } from "react-router-dom";
 
 export const protectedLoader = async () => {
-  enableMocking()
+  await enableMocking()
   const token = await useSession.getState().refreshToken();
   if (!token) {
     useSession.getState().logout();
